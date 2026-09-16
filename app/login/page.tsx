@@ -121,13 +121,7 @@ function LoginForm() {
               </Badge>
             </div>
 
-            <CardTitle className="pt-2 text-xl">
-              Welcome back
-            </CardTitle>
 
-            <CardDescription>
-              Sign in with your admin account to continue.
-            </CardDescription>
           </CardHeader>
 
           <CardContent>
