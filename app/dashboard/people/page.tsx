@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import InitialsAvatar from "@/components/InitialsAvatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import RoleControl from "./RoleControl";
+import SubmitButton from "@/components/SubmitButton";
+import { setUserStatus } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +19,8 @@ export default async function PeoplePage() {
     { data: retailers },
     { data: admins },
     { data: consumers },
+    { data: waiting },
+    { data: userData },
   ] = await Promise.all([
     supabase.from("admin_farmer_activity").select("*").order("batch_count", { ascending: false }),
     supabase.from("admin_transporter_activity").select("*").order("delivery_count", { ascending: false }),
@@ -30,7 +35,17 @@ export default async function PeoplePage() {
       .eq("role", "retailer"),
     supabase.from("profiles").select("id, name, email, created_at").eq("role", "admin"),
     supabase.from("profiles").select("id, name, email, created_at").eq("role", "consumer"),
+    // Accounts that are not approved yet (needs migration_user_approval.sql; empty until then).
+    supabase
+      .from("profiles")
+      .select("id, name, email, phone, role, status, created_at")
+      .in("status", ["pending", "rejected"])
+      .order("created_at", { ascending: true }),
+    supabase.auth.getUser(),
   ]);
+  const pending = (waiting ?? []).filter((u: any) => u.status === "pending");
+  const declined = (waiting ?? []).filter((u: any) => u.status === "rejected");
+  const me = userData.user?.id;
 
   return (
     <div className="space-y-6">
@@ -38,6 +53,84 @@ export default async function PeoplePage() {
         <h1 className="font-heading text-xl font-semibold text-foreground">People</h1>
         <p className="text-sm text-muted-foreground">Everyone across the supply chain</p>
       </div>
+
+      <Card className={pending.length > 0 ? "border-amber-500/50" : ""}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Waiting for approval
+            {pending.length > 0 && <Badge>{pending.length}</Badge>}
+          </CardTitle>
+          <CardDescription>
+            New farmers, intermediaries, transporters and retailers can sign in, but see nothing until you approve them
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          {pending.map((u: any) => (
+            <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-xl px-2 py-2.5">
+              <InitialsAvatar name={u.name} />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium text-foreground">{u.name ?? "Unnamed"}</div>
+                <div className="truncate text-xs text-muted-foreground">
+                  {u.email ?? "no email"}
+                  {u.phone ? ` · ${u.phone}` : ""} &middot; signed up {new Date(u.created_at).toLocaleDateString()}
+                </div>
+              </div>
+              <RoleControl id={u.id} role={u.role} me={me} />
+              <form action={setUserStatus} className="flex shrink-0 items-center gap-1.5">
+                <input type="hidden" name="target" value={u.id} />
+                <input type="hidden" name="status" value="approved" />
+                <SubmitButton size="sm" pendingText="Approving…" className="h-8 px-3 text-xs">
+                  Approve
+                </SubmitButton>
+              </form>
+              <form action={setUserStatus} className="shrink-0">
+                <input type="hidden" name="target" value={u.id} />
+                <input type="hidden" name="status" value="rejected" />
+                <SubmitButton
+                  size="sm"
+                  variant="outline"
+                  pendingText="Rejecting…"
+                  className="h-8 px-3 text-xs text-destructive"
+                >
+                  Reject
+                </SubmitButton>
+              </form>
+            </div>
+          ))}
+          {!pending.length && (
+            <p className="py-6 text-center text-sm text-muted-foreground">No one is waiting for approval.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {declined.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Rejected accounts</CardTitle>
+            <CardDescription>These people cannot see or submit anything. You can approve them later.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {declined.map((u: any) => (
+              <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-xl px-2 py-2.5">
+                <InitialsAvatar name={u.name} />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-medium text-foreground">{u.name ?? "Unnamed"}</div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {u.email ?? "no email"} &middot; {u.role}
+                  </div>
+                </div>
+                <form action={setUserStatus} className="shrink-0">
+                  <input type="hidden" name="target" value={u.id} />
+                  <input type="hidden" name="status" value="approved" />
+                  <SubmitButton size="sm" variant="outline" pendingText="Approving…" className="h-8 px-3 text-xs">
+                    Approve
+                  </SubmitButton>
+                </form>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
@@ -47,15 +140,14 @@ export default async function PeoplePage() {
           </CardHeader>
           <CardContent className="space-y-1">
             {(farmers ?? []).map((f) => (
-              <Link
-                key={f.farmer_id}
-                href={`/dashboard/batches?farmer=${f.farmer_id}`}
-                className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-accent/60"
-              >
-                <InitialsAvatar name={f.name} />
-                <div className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{f.name}</div>
-                <Badge variant="secondary">{f.batch_count} batches</Badge>
-              </Link>
+              <div key={f.farmer_id} className="flex items-center gap-2 rounded-xl px-2 py-2.5 transition hover:bg-accent/60">
+                <Link href={`/dashboard/batches?farmer=${f.farmer_id}`} className="flex min-w-0 flex-1 items-center gap-3">
+                  <InitialsAvatar name={f.name} />
+                  <div className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{f.name}</div>
+                  <Badge variant="secondary">{f.batch_count} batches</Badge>
+                </Link>
+                <RoleControl id={f.farmer_id} role="farmer" me={me} />
+              </div>
             ))}
             {!farmers?.length && <p className="py-6 text-center text-sm text-muted-foreground">No farmers yet.</p>}
           </CardContent>
@@ -68,20 +160,22 @@ export default async function PeoplePage() {
           </CardHeader>
           <CardContent className="space-y-1">
             {(transporters ?? []).map((t) => (
-              <Link
-                key={t.transporter_id}
-                href={`/dashboard/transport?transporter=${t.transporter_id}`}
-                className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-accent/60"
-              >
-                <InitialsAvatar name={t.name} />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium text-foreground">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    Avg. {t.avg_transit_hours ? t.avg_transit_hours.toFixed(1) : "—"}h transit
+              <div key={t.transporter_id} className="flex items-center gap-2 rounded-xl px-2 py-2.5 transition hover:bg-accent/60">
+                <Link
+                  href={`/dashboard/transport?transporter=${t.transporter_id}`}
+                  className="flex min-w-0 flex-1 items-center gap-3"
+                >
+                  <InitialsAvatar name={t.name} />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium text-foreground">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Avg. {t.avg_transit_hours ? t.avg_transit_hours.toFixed(1) : "—"}h transit
+                    </div>
                   </div>
-                </div>
-                <Badge variant="secondary">{t.delivery_count} deliveries</Badge>
-              </Link>
+                  <Badge variant="secondary">{t.delivery_count} deliveries</Badge>
+                </Link>
+                <RoleControl id={t.transporter_id} role="transporter" me={me} />
+              </div>
             ))}
             {!transporters?.length && (
               <p className="py-6 text-center text-sm text-muted-foreground">No transporters yet.</p>
@@ -104,6 +198,7 @@ export default async function PeoplePage() {
                 <Badge variant="secondary">
                   {i.consolidation_records?.[0]?.count ?? 0} consolidations
                 </Badge>
+                <RoleControl id={i.id} role="intermediary" me={me} />
               </div>
             ))}
             {!intermediaries?.length && (
@@ -125,6 +220,7 @@ export default async function PeoplePage() {
                   {r.name ?? "Unnamed"}
                 </div>
                 <Badge variant="secondary">{r.retail_records?.[0]?.count ?? 0} receipts</Badge>
+                <RoleControl id={r.id} role="retailer" me={me} />
               </div>
             ))}
             {!retailers?.length && (
@@ -146,6 +242,7 @@ export default async function PeoplePage() {
                   <div className="truncate text-sm font-medium text-foreground">{a.name ?? "Unnamed"}</div>
                   <div className="truncate text-xs text-muted-foreground">{a.email ?? "—"}</div>
                 </div>
+                <RoleControl id={a.id} role="admin" me={me} />
               </div>
             ))}
             {!admins?.length && <p className="py-6 text-center text-sm text-muted-foreground">No admins yet.</p>}
@@ -164,6 +261,7 @@ export default async function PeoplePage() {
                 <div className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
                   {c.name ?? "Unnamed user"}
                 </div>
+                <RoleControl id={c.id} role="consumer" me={me} />
               </div>
             ))}
             {!consumers?.length && (

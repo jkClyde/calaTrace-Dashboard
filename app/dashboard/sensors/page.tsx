@@ -36,9 +36,14 @@ export default async function SensorsPage({ searchParams }: { searchParams: { pa
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-xl font-semibold text-foreground">Sensors</h1>
-        <p className="text-sm text-muted-foreground">{count ?? 0} alerts logged</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-heading text-xl font-semibold text-foreground">Sensors</h1>
+          <p className="text-sm text-muted-foreground">{count ?? 0} alerts logged</p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/dashboard/sensors/limits">Edit safe limits</Link>
+        </Button>
       </div>
 
       <Card>
