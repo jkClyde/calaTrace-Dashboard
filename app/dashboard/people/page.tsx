@@ -68,7 +68,7 @@ export default async function PeoplePage() {
           {pending.map((u: any) => (
             <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-xl px-2 py-2.5">
               <InitialsAvatar name={u.name} />
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 basis-48">
                 <div className="truncate text-sm font-medium text-foreground">{u.name ?? "Unnamed"}</div>
                 <div className="truncate text-xs text-muted-foreground">
                   {u.email ?? "no email"}
@@ -140,11 +140,11 @@ export default async function PeoplePage() {
           </CardHeader>
           <CardContent className="space-y-1">
             {(farmers ?? []).map((f) => (
-              <div key={f.farmer_id} className="flex items-center gap-2 rounded-xl px-2 py-2.5 transition hover:bg-accent/60">
-                <Link href={`/dashboard/batches?farmer=${f.farmer_id}`} className="flex min-w-0 flex-1 items-center gap-3">
+              <div key={f.farmer_id} className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-xl px-2 py-2.5 transition hover:bg-accent/60">
+                <Link href={`/dashboard/batches?farmer=${f.farmer_id}`} className="flex min-w-0 flex-1 basis-48 items-center gap-3">
                   <InitialsAvatar name={f.name} />
                   <div className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{f.name}</div>
-                  <Badge variant="secondary">{f.batch_count} batches</Badge>
+                  <Badge variant="secondary" className="whitespace-nowrap">{f.batch_count} batches</Badge>
                 </Link>
                 <RoleControl id={f.farmer_id} role="farmer" me={me} />
               </div>
@@ -160,10 +160,10 @@ export default async function PeoplePage() {
           </CardHeader>
           <CardContent className="space-y-1">
             {(transporters ?? []).map((t) => (
-              <div key={t.transporter_id} className="flex items-center gap-2 rounded-xl px-2 py-2.5 transition hover:bg-accent/60">
+              <div key={t.transporter_id} className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded-xl px-2 py-2.5 transition hover:bg-accent/60">
                 <Link
                   href={`/dashboard/transport?transporter=${t.transporter_id}`}
-                  className="flex min-w-0 flex-1 items-center gap-3"
+                  className="flex min-w-0 flex-1 basis-48 items-center gap-3"
                 >
                   <InitialsAvatar name={t.name} />
                   <div className="min-w-0 flex-1">
@@ -172,7 +172,7 @@ export default async function PeoplePage() {
                       Avg. {t.avg_transit_hours ? t.avg_transit_hours.toFixed(1) : "—"}h transit
                     </div>
                   </div>
-                  <Badge variant="secondary">{t.delivery_count} deliveries</Badge>
+                  <Badge variant="secondary" className="whitespace-nowrap">{t.delivery_count} deliveries</Badge>
                 </Link>
                 <RoleControl id={t.transporter_id} role="transporter" me={me} />
               </div>
@@ -190,9 +190,9 @@ export default async function PeoplePage() {
           </CardHeader>
           <CardContent className="space-y-1">
             {(intermediaries ?? []).map((i: any) => (
-              <div key={i.id} className="flex items-center gap-3 rounded-xl px-2 py-2.5">
+              <div key={i.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl px-2 py-2.5">
                 <InitialsAvatar name={i.name} />
-                <div className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+                <div className="min-w-0 flex-1 basis-32 truncate text-sm font-medium text-foreground">
                   {i.name ?? "Unnamed"}
                 </div>
                 <Badge variant="secondary">
@@ -214,9 +214,9 @@ export default async function PeoplePage() {
           </CardHeader>
           <CardContent className="space-y-1">
             {(retailers ?? []).map((r: any) => (
-              <div key={r.id} className="flex items-center gap-3 rounded-xl px-2 py-2.5">
+              <div key={r.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl px-2 py-2.5">
                 <InitialsAvatar name={r.name} />
-                <div className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+                <div className="min-w-0 flex-1 basis-32 truncate text-sm font-medium text-foreground">
                   {r.name ?? "Unnamed"}
                 </div>
                 <Badge variant="secondary">{r.retail_records?.[0]?.count ?? 0} receipts</Badge>
@@ -236,9 +236,9 @@ export default async function PeoplePage() {
           </CardHeader>
           <CardContent className="space-y-1">
             {(admins ?? []).map((a) => (
-              <div key={a.id} className="flex items-center gap-3 rounded-xl px-2 py-2.5">
+              <div key={a.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl px-2 py-2.5">
                 <InitialsAvatar name={a.name} />
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 basis-32">
                   <div className="truncate text-sm font-medium text-foreground">{a.name ?? "Unnamed"}</div>
                   <div className="truncate text-xs text-muted-foreground">{a.email ?? "—"}</div>
                 </div>
@@ -256,9 +256,9 @@ export default async function PeoplePage() {
           </CardHeader>
           <CardContent className="space-y-1">
             {(consumers ?? []).map((c) => (
-              <div key={c.id} className="flex items-center gap-3 rounded-xl px-2 py-2.5">
+              <div key={c.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl px-2 py-2.5">
                 <InitialsAvatar name={c.name} />
-                <div className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+                <div className="min-w-0 flex-1 basis-32 truncate text-sm font-medium text-foreground">
                   {c.name ?? "Unnamed user"}
                 </div>
                 <RoleControl id={c.id} role="consumer" me={me} />

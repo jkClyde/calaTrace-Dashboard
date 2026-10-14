@@ -27,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {!!pendingCount && pendingCount > 0 && (
           <Link
             href="/dashboard/people"
-            className="flex items-center justify-center gap-2 bg-amber-500/15 px-6 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-500/25 dark:text-amber-300"
+            className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-amber-500/15 px-4 py-2 text-center text-sm font-medium text-amber-800 transition hover:bg-amber-500/25 dark:text-amber-300"
           >
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 opacity-75" />
@@ -41,7 +41,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <Suspense fallback={null}>
           <FlashToast />
         </Suspense>
-        <main className="mx-auto  px-6 py-8 lg:px-10">{children}</main>
+        <main className="mx-auto px-4 py-5 sm:px-6 sm:py-8 lg:px-10">{children}</main>
       </div>
     </TooltipProvider>
   );

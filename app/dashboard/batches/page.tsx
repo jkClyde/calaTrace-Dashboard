@@ -107,7 +107,7 @@ export default async function BatchesPage({
             <CardTitle>All batches</CardTitle>
             <CardDescription>Click a batch to see its full journey</CardDescription>
           </div>
-          <form method="get" className="flex items-center gap-2">
+          <form method="get" className="flex w-full items-center gap-2 sm:w-auto">
             {stage && <input type="hidden" name="stage" value={stage} />}
             {farmer && <input type="hidden" name="farmer" value={farmer} />}
             {farm && <input type="hidden" name="farm" value={farm} />}
@@ -115,7 +115,7 @@ export default async function BatchesPage({
               name="q"
               defaultValue={searchParams.q ?? ""}
               placeholder="Search code, e.g. CLM-0001"
-              className="h-9 w-56 rounded-md border border-input bg-background px-3 text-sm"
+              className="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm sm:w-56 sm:flex-none"
             />
             <Button type="submit" size="sm">
               Search

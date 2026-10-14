@@ -63,7 +63,7 @@ export default function Topbar({
           <p className="text-sm text-muted-foreground">Signing out…</p>
         </div>
       )}
-      <header className="sticky top-0 z-20 flex flex-wrap items-center gap-4 border-b border-border bg-background/90 px-6 py-3 backdrop-blur lg:px-10">
+      <header className="sticky top-0 z-20 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-background/90 px-4 py-2.5 backdrop-blur sm:px-6 lg:gap-x-4 lg:px-10 lg:py-3">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Leaf size={17} strokeWidth={2.25} />
@@ -71,7 +71,7 @@ export default function Topbar({
           <span className="hidden font-logo text-lg text-foreground sm:inline">CalaTrace</span>
         </Link>
 
-        <nav className="flex items-center gap-1 overflow-x-auto">
+        <nav className="order-last flex w-full items-center gap-1 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] lg:order-none lg:w-auto lg:pb-0 [&::-webkit-scrollbar]:hidden">
           {NAV_ITEMS.map((item) => {
             const active = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
             return (
@@ -89,8 +89,8 @@ export default function Topbar({
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-3">
-          <form onSubmit={handleSearch} className="relative hidden sm:block">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <form onSubmit={handleSearch} className="relative hidden md:block">
             <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"

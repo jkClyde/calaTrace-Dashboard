@@ -67,7 +67,7 @@ export default function FlashToast() {
             <div
                 role={isError ? "alert" : "status"}
                 aria-live={isError ? "assertive" : "polite"}
-                className={`flash-toast fixed left-4 right-4 top-20 z-50 overflow-hidden rounded-xl border bg-card shadow-lg transition-all duration-300 ease-out sm:left-auto sm:w-96 ${isError ? "border-destructive/40" : "border-emerald-500/40"
+                className={`flash-toast fixed left-4 right-4 top-28 z-50 lg:top-20 overflow-hidden rounded-xl border bg-card shadow-lg transition-all duration-300 ease-out sm:left-auto sm:w-96 ${isError ? "border-destructive/40" : "border-emerald-500/40"
                     } ${visible ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-3 opacity-0"}`}
             >
                 <div className="flex items-start gap-3 p-4">

@@ -51,9 +51,9 @@ export default async function FarmsPage() {
                         <Link
                             key={f.id}
                             href={`/dashboard/farms/${f.id}`}
-                            className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-accent/60"
+                            className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl px-2 py-2.5 transition hover:bg-accent/60"
                         >
-                            <div className="min-w-0 flex-1">
+                            <div className="min-w-0 flex-1 basis-40">
                                 <div className="truncate text-sm font-medium text-foreground">{f.name}</div>
                                 <div className="truncate text-xs text-muted-foreground">
                                     {f.barangay}, {f.municipality}
@@ -69,7 +69,7 @@ export default async function FarmsPage() {
                                     No farmer
                                 </Badge>
                             )}
-                            <ChevronRight size={14} className="text-muted-foreground" />
+                            <ChevronRight size={14} className="hidden text-muted-foreground sm:block" />
                         </Link>
                     ))}
                     {!farms?.length && <p className="py-6 text-center text-sm text-muted-foreground">No farms yet.</p>}
